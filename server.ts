@@ -1,19 +1,10 @@
-import dotenv from 'dotenv';
-import express, { Request, Response } from 'express';
+// typically focus only on starting the server and connecting to the database
+import app from "./app";
 import connectDB from "./src/config/db";
 
-dotenv.config();
-connectDB();
-
-
-const app = express();
 const port =process.env.PORT || 3000;
 
-app.use(express.json());
-
-app.use('/', (req: Request, res: Response) => {
-  res.send('Hello, world!');
-});
+connectDB();
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);

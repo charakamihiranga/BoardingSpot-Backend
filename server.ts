@@ -1,7 +1,15 @@
+import dotenv from 'dotenv';
 import express, { Request, Response } from 'express';
+import connectDB from "./src/config/db";
+
+dotenv.config();
+connectDB();
+
 
 const app = express();
-const port = 3000;
+const port =process.env.PORT || 3000;
+
+app.use(express.json());
 
 app.use('/', (req: Request, res: Response) => {
   res.send('Hello, world!');

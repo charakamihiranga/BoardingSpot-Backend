@@ -8,4 +8,5 @@ export interface IUser extends Document {
     occupation: Occupations;
     profilePicture: string;
     password: string;
+    matchPassword(enteredPassword: string): Promise<boolean>;
 }

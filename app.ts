@@ -2,7 +2,6 @@ import dotenv from "dotenv";
 import express, { Request, Response} from "express";
 import cors from "cors";
 import authRoutes from "./src/routes/authRoutes";
-import {authenticationToken} from "./src/config/jwtConfig";
 import roomRoutes from "./src/routes/roomRoutes";
 
 dotenv.config();
@@ -20,9 +19,6 @@ app.use(express.json());
 
 // routes
 app.use('/api/v1/auth', authRoutes);
-
-app.use(authenticationToken);
-
 app.use('/api/v1/rooms', roomRoutes);
 
 export default app;

@@ -1,8 +1,8 @@
 import User from "../models/User";
-import {Request, Response} from "express";
+import express, {Request, Response} from "express";
 import generateToken from "../utils/generateToken";
 
-export const signUpUser = async (req: Request , res: Response ) => {
+export const signUpUser = async (req: any, res: any ) => {
     const {fullName, email, dob, occupation, gender, profilePicture, password} = req.body;
     try {
         const userExists = await User.findOne({email});

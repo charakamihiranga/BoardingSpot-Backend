@@ -82,3 +82,16 @@ export const deleteBoarding = async (req: any, res: any ) => {
         res.status(500).json({message: 'Internal server error'});
     }
 }
+
+export const getBoardingsByOwner = async (req: any, res: any) => {
+    try {
+        const {ownerId} = req.params;
+        if (!mongoose.Types.ObjectId.isValid(ownerId)) {
+            return res.status(400).json({ message: "Invalid owner ID" });
+        }
+        const boardings = await Boarding.find({owner: ownerId});
+        res.status(200).json(boardings);
+    } catch (e) {
+        res.status(500).json({message: 'Internal server error'});
+    }
+}

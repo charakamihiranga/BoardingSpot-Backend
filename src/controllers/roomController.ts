@@ -83,6 +83,40 @@ export const deleteBoarding = async (req: any, res: any ) => {
     }
 }
 
+export const updateBoarding = async (req: any, res: any) => {
+    try {
+        const {id} = req.params;
+        const updates = req.body;
+
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({message: "Invalid boarding ID"});
+        }
+        const existingBoarding = await Boarding.findById(id);
+        if (!existingBoarding) {
+            return res.status(404).json({message: "Boarding not found"});
+        }
+        // Update location if only one of the latitude or longitude is provided
+        updates.location = {
+            latitude: updates.location?.latitude ?? existingBoarding.location.latitude,
+            longitude: updates.location?.longitude ?? existingBoarding.location.longitude,
+        };
+
+        // Delete existing images if new images are uploaded
+        if (req.files && req.files.length > 0) {
+            if (existingBoarding.photos && existingBoarding.photos.length > 0) {
+                await deleteImages(existingBoarding.photos);
+            }
+            // Upload new images
+            updates.photos = await imageUploader(req.files as Express.Multer.File[]);
+        }
+        const updatedBoarding = await Boarding.findByIdAndUpdate(id, updates, {new: true, runValidators: true});
+        res.status(200).json({message: 'Boarding updated successfully', boarding: updatedBoarding});
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
 export const getBoardingsByOwner = async (req: any, res: any) => {
     try {
         const {ownerId} = req.params;
@@ -95,3 +129,4 @@ export const getBoardingsByOwner = async (req: any, res: any) => {
         res.status(500).json({message: 'Internal server error'});
     }
 }
+

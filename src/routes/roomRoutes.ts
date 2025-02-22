@@ -4,7 +4,7 @@ import {
     deleteBoarding,
     getAllBoarding,
     getBoardingById,
-    getBoardingsByOwner
+    getBoardingsByOwner, updateBoarding
 } from "../controllers/roomController";
 import {upload} from "../middleware/upload";
 
@@ -15,5 +15,6 @@ router.get('/', getAllBoarding);
 router.get('/:id', getBoardingById);
 router.delete('/:id', deleteBoarding);
 router.get('/owner/:ownerId', getBoardingsByOwner);
+router.patch('/:id', upload, updateBoarding);
 
 export default router;

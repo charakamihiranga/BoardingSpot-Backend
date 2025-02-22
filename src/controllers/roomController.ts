@@ -1,6 +1,7 @@
 import express from "express";
 import imageUploader from "../utils/ImageUploader";
 import Boarding from "../models/Boarding";
+import mongoose from "mongoose";
 
 export const addBoarding = async (req: express.Request, res: express.Response) => {
     try {
@@ -32,5 +33,33 @@ export const addBoarding = async (req: express.Request, res: express.Response) =
     } catch (e) {
         res.status(500).json({message: 'Internal server error'});
       console.error(e);
+    }
+}
+
+export const getAllBoarding =async (req: express.Request, res: express.Response) => {
+    try {
+        const boardings = await Boarding.find();
+        res.status(200).json(boardings);
+    } catch (e) {
+        res.status(500).json({message: 'Internal server error'});
+        console.error(e);
+    }
+}
+
+export const getBoardingById = async (req: any, res: any) => {
+    try {
+        const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid boarding ID" });
+        }
+        const boarding = await Boarding.findById(id);
+        if (!boarding) {
+            res.status(404).json({message: 'Boarding not found'});
+        } else {
+            res.status(200).json(boarding);
+        }
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({message: 'Internal server error'});
     }
 }

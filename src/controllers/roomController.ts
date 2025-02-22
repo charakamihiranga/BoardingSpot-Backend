@@ -1,5 +1,5 @@
 import express from "express";
-import imageUploader from "../utils/ImageUploader";
+import {deleteImages, imageUploader} from "../utils/cloudinaryUtil";
 import Boarding from "../models/Boarding";
 import mongoose from "mongoose";
 
@@ -57,6 +57,25 @@ export const getBoardingById = async (req: any, res: any) => {
             res.status(404).json({message: 'Boarding not found'});
         } else {
             res.status(200).json(boarding);
+        }
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+
+export const deleteBoarding = async (req: any, res: any ) => {
+    try {
+     const { id } = req.params;
+        if (!mongoose.Types.ObjectId.isValid(id)) {
+            return res.status(400).json({ message: "Invalid boarding ID" });
+        }
+        const boarding = await Boarding.findByIdAndDelete(id);
+        if (!boarding) {
+            res.status(404).json({message: 'Boarding not found'});
+        } else {
+            await deleteImages(boarding.photos);
+            res.status(200).json({message: 'Boarding deleted successfully'});
         }
     } catch (e) {
         console.error(e);

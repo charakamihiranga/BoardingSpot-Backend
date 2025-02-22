@@ -9,6 +9,7 @@ const UserSchema = new Schema<IUser>({
     email: {type: String, required: true},
     dob: {type: Date, required: true},
     occupation: {type: String, required: true},
+    gender: {type: String, required: true},
     profilePicture: {type: String, required: true},
     password: {type: String, required: true},
 })

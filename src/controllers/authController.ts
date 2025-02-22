@@ -3,18 +3,19 @@ import {Request, Response} from "express";
 import generateToken from "../utils/generateToken";
 
 export const signUpUser = async (req: Request , res: Response ) => {
-    const {fullName, email, dob, occupation, profilePicture, password} = req.body;
+    const {fullName, email, dob, occupation, gender, profilePicture, password} = req.body;
     try {
         const userExists = await User.findOne({email});
         if (userExists) {
             return res.status(400).json({message: 'User already exists with this email.use another email'});
         }
-        const user = await User.create({fullName, email, dob, occupation, profilePicture, password});
+        const user = await User.create({fullName, email, dob, occupation, gender, profilePicture, password});
         if (user) {
             res.status(201).json({
                 _id: user._id,
                 fullName: user.fullName,
                 email: user.email,
+                gender: user.gender,
                 token: generateToken(user._id as string),
             });
         } else {
@@ -34,6 +35,7 @@ export const signInUser =  async (req: Request, res: Response) => {
                 _id: user._id,
                 fullName: user.fullName,
                 email: user.email,
+                gender: user.gender,
                 token: generateToken(user._id as string),
             });
         } else {

@@ -1,7 +1,7 @@
 import { Router } from "express";
 import {
     addBoarding,
-    deleteBoarding,
+    deleteBoarding, filterBoardings,
     getAllBoarding,
     getBoardingById,
     getBoardingsByOwner, updateBoarding
@@ -13,9 +13,11 @@ const router = Router();
 
 router.post('/',protector, upload, addBoarding);
 router.get('/',protector, getAllBoarding);
+router.get('/filter', protector, filterBoardings);
 router.get('/:id',protector, getBoardingById);
 router.delete('/:id',protector, deleteBoarding);
 router.get('/owner/:ownerId',protector, getBoardingsByOwner);
 router.patch('/:id',protector, upload, updateBoarding);
+
 
 export default router;

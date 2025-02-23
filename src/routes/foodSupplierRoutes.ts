@@ -16,4 +16,5 @@ router.get('/:id', protector, getFoodSupplierById);
 router.patch('/:id', protector, upload, updateFoodSupplier);
 router.delete('/:id', protector, deleteFoodSupplier);
 
+
 export default router;

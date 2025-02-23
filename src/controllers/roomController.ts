@@ -130,3 +130,23 @@ export const getBoardingsByOwner = async (req: any, res: any) => {
     }
 }
 
+export const filterBoardings = async (req: any, res: any) => {
+    try {
+        const {city, genderPreference, capacity, maxPrice, foodAvailability, forWhom, category} = req.query;
+        const filterQuery: any = {};
+        if (city) filterQuery.city = city;
+        if (genderPreference) filterQuery.genderPreference = genderPreference;
+        if (capacity) filterQuery.capacity = {$gte: Number(capacity)};
+        if (maxPrice) filterQuery.rent = {$lte: Number(maxPrice)};
+        if (foodAvailability) filterQuery.foodAvailability = foodAvailability === 'true';
+        if (forWhom) filterQuery.forWhom = forWhom;
+        if (category) filterQuery.category = category;
+
+        const filteredBoardings = await Boarding.find(filterQuery);
+        res.status(200).json(filteredBoardings);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}
+

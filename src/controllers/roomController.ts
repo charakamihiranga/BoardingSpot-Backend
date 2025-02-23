@@ -36,16 +36,6 @@ export const addBoarding = async (req: express.Request, res: express.Response) =
     }
 }
 
-export const getAllBoarding =async (req: express.Request, res: express.Response) => {
-    try {
-        const boardings = await Boarding.find();
-        res.status(200).json(boardings);
-    } catch (e) {
-        res.status(500).json({message: 'Internal server error'});
-        console.error(e);
-    }
-}
-
 export const getBoardingById = async (req: any, res: any) => {
     try {
         const { id } = req.params;
@@ -130,23 +120,72 @@ export const getBoardingsByOwner = async (req: any, res: any) => {
     }
 }
 
-export const filterBoardings = async (req: any, res: any) => {
+export const getBoardings = async(req: any, res: any) => {
     try {
-        const {city, genderPreference, capacity, maxPrice, foodAvailability, forWhom, category} = req.query;
+        const {city, genderPreference, capacity, maxPrice, foodAvailability,
+            forWhom, category, page=1, limit=10} = req.query;
         const filterQuery: any = {};
         if (city) filterQuery.city = city;
         if (genderPreference) filterQuery.genderPreference = genderPreference;
-        if (capacity) filterQuery.capacity = {$gte: Number(capacity)};
-        if (maxPrice) filterQuery.rent = {$lte: Number(maxPrice)};
-        if (foodAvailability) filterQuery.foodAvailability = foodAvailability === 'true';
+        if (capacity) filterQuery.capacity = { $gte: Number(capacity) };
+        if (maxPrice) filterQuery.rent = { $lte: Number(maxPrice) };
+        if (foodAvailability) filterQuery.foodAvailability = foodAvailability === "true";
         if (forWhom) filterQuery.forWhom = forWhom;
         if (category) filterQuery.category = category;
 
-        const filteredBoardings = await Boarding.find(filterQuery);
-        res.status(200).json(filteredBoardings);
+        const total = await Boarding.countDocuments(filterQuery);
+
+        const boardings = await Boarding.find(filterQuery)
+            .sort({ createdAt: -1})
+            .skip((Number(page) -1 ) * Number(limit))
+            .limit(Number(limit));
+
+        res.status(200).json({
+            data: boardings,
+            page: Number(page),
+            totalPages: Math.ceil(total / Number(limit)),
+            totalItems: total,
+            hasMore: Number(page) * Number(limit) < total,
+        });
     } catch (e) {
         console.error(e);
         res.status(500).json({message: 'Internal server error'});
     }
 }
 
+export const getBoardingsByLocationBounds = async (req: any, res: any) => {
+    try {
+        const neLat = Number(req.query.neLat);
+        const neLng = Number(req.query.neLng);
+        const swLat = Number(req.query.swLat);
+        const swLng = Number(req.query.swLng);
+        const page = Number(req.query.page) || 1;
+        const limit = Number(req.query.limit) || 20;
+
+        if (isNaN(neLat) || isNaN(neLng) || isNaN(swLat) || isNaN(swLng)) {
+            return res.status(400).json({ message: "Invalid location bounds" });
+        }
+
+        const filterQuery = {
+            "location.latitude": { $gte: swLat, $lte: neLat },
+            "location.longitude": { $gte: swLng, $lte: neLng }
+        };
+
+        const total = await Boarding.countDocuments(filterQuery);
+
+        const boardings = await Boarding.find(filterQuery)
+            .sort({ createdAt: -1 })
+            .skip((page - 1) * limit)
+            .limit(limit);
+
+        res.status(200).json({
+            data: boardings,
+            page,
+            totalPages: Math.ceil(total / limit),
+            hasMore: page * limit < total
+        });
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({ message: "Internal server error" });
+    }
+};

@@ -3,6 +3,7 @@ import express, { Request, Response} from "express";
 import cors from "cors";
 import authRoutes from "./src/routes/authRoutes";
 import roomRoutes from "./src/routes/roomRoutes";
+import foodSupplierRoutes from "./src/routes/foodSupplierRoutes";
 
 dotenv.config();
 
@@ -20,5 +21,6 @@ app.use(express.json());
 // routes
 app.use('/api/v1/auth', authRoutes);
 app.use('/api/v1/rooms', roomRoutes);
+app.use('/api/v1/food-suppliers', foodSupplierRoutes);
 
 export default app;

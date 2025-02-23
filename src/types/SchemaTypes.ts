@@ -2,6 +2,7 @@ import {Document} from "mongoose";
 import {Occupations} from "../models/enums/Occupations";
 import {Gender} from "../models/enums/Gender";
 import {RoomCategory} from "../models/enums/RoomCategory";
+import {FoodType} from "../models/enums/FoodType";
 
 export interface IUser extends Document {
     fullName: string;
@@ -31,4 +32,18 @@ export interface IBoarding extends Document {
     foodAvailability: boolean;
     photos: string[];
     owner: IUser['_id'];
+}
+
+export interface IFoodSupplier extends Document {
+    fullName: string;
+    location: {
+        latitude: number;
+        longitude: number;
+    };
+    mobileNo: number;
+    description: string;
+    foodType: FoodType[];
+    price: number;
+    photos: string[];
+    userId: IUser['_id'];
 }

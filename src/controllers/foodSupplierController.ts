@@ -111,3 +111,19 @@ export const deleteFoodSupplier = async (req: any, res: any) => {
         res.status(500).json({message: 'Internal server error'});
     }
 }
+
+export const filterFoodSuppliers = async (req: any, res: any) => {
+    try {
+        const { city, type, maxPrice } = req.query;
+        const filterQuery: any = {};
+        if (city) filterQuery.city = city;
+        if (type) filterQuery.foodType = type;
+        if (maxPrice) filterQuery.price = {$lte: Number(maxPrice)};
+
+        const foodSuppliers = await FoodSupplier.find(filterQuery);
+        res.status(200).json(foodSuppliers);
+    } catch (e) {
+        console.error(e);
+        res.status(500).json({message: 'Internal server error'});
+    }
+}

@@ -7,14 +7,15 @@ import {
     getBoardingsByOwner, updateBoarding
 } from "../controllers/roomController";
 import {upload} from "../middleware/upload";
+import {protector} from "../middleware/authMiddleware";
 
 const router = Router();
 
-router.post('/',upload, addBoarding);
-router.get('/', getAllBoarding);
-router.get('/:id', getBoardingById);
-router.delete('/:id', deleteBoarding);
-router.get('/owner/:ownerId', getBoardingsByOwner);
-router.patch('/:id', upload, updateBoarding);
+router.post('/',protector, upload, addBoarding);
+router.get('/',protector, getAllBoarding);
+router.get('/:id',protector, getBoardingById);
+router.delete('/:id',protector, deleteBoarding);
+router.get('/owner/:ownerId',protector, getBoardingsByOwner);
+router.patch('/:id',protector, upload, updateBoarding);
 
 export default router;

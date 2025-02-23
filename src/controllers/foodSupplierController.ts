@@ -32,15 +32,35 @@ export const addFoodSupplier = async (req: express.Request, res: express.Respons
     }
 }
 
-export const getAllFoodSuppliers = async (req: express.Request, res: express.Response) => {
+export const getFoodSuppliers = async (req: any, res: any) => {
     try {
-        const foodSuppliers = await FoodSupplier.find();
-        res.status(200).json(foodSuppliers);
+        const { city, foodType, maxPrice, page = 1, limit = 10 } = req.query;
+
+        const query: any = {};
+        if (city) query.city = city;
+        if (foodType) query.foodType = foodType;
+        if (maxPrice) query.price = { $lte: Number(maxPrice) };
+
+        const total = await FoodSupplier.countDocuments(query);
+
+        const foodSuppliers = await FoodSupplier.find(query)
+            .sort({ createdAt: -1 }) // Newest first
+            .skip((Number(page) - 1) * Number(limit))
+            .limit(Number(limit));
+
+        res.status(200).json({
+            data: foodSuppliers,
+            page: Number(page),
+            count: total,
+            totalPages: Math.ceil(total / Number(limit)),
+            hasMore: Number(page) * Number(limit) < total,
+        });
     } catch (e) {
         console.error(e);
-        res.status(500).json({message: 'Internal server error'});
+        res.status(500).json({ message: "Internal server error" });
     }
-}
+};
+
 
 export const getFoodSupplierById = async (req: any, res: any) => {
     try {
@@ -112,18 +132,3 @@ export const deleteFoodSupplier = async (req: any, res: any) => {
     }
 }
 
-export const filterFoodSuppliers = async (req: any, res: any) => {
-    try {
-        const { city, type, maxPrice } = req.query;
-        const filterQuery: any = {};
-        if (city) filterQuery.city = city;
-        if (type) filterQuery.foodType = type;
-        if (maxPrice) filterQuery.price = {$lte: Number(maxPrice)};
-
-        const foodSuppliers = await FoodSupplier.find(filterQuery);
-        res.status(200).json(foodSuppliers);
-    } catch (e) {
-        console.error(e);
-        res.status(500).json({message: 'Internal server error'});
-    }
-}

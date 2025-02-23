@@ -1,10 +1,15 @@
-import jwt, {Secret} from "jsonwebtoken";
+import jwt from "jsonwebtoken";
 
-const generateToken = (userId: string): string => {
+export const generateAccessToken = (userId: string) => {
     // @ts-ignore
-    return jwt.sign({id: userId}, process.env.JWT_SECRET as Secret , {
-        expiresIn: process.env.JWT_EXPIRE
+    return jwt.sign({ userId }, process.env.ACCESS_TOKEN_SECRET as string, {
+        expiresIn: process.env.JWT_EXPIRE as string,
     });
-}
+};
 
-export default generateToken;
+export const generateRefreshToken = (userId: string) => {
+    // @ts-ignore
+    return jwt.sign({ userId }, process.env.REFRESH_TOKEN_SECRET as string, {
+        expiresIn: process.env.REFRESH_TOKEN_EXPIRE as string,
+    });
+};

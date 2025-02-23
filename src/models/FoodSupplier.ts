@@ -8,6 +8,7 @@ const FoodSupplierSchema = new Schema<IFoodSupplier>({
         latitude: { type: Number, required: true },
         longitude: { type: Number, required: true },
     },
+    city: { type: String, required: true },
     mobileNo: { type: Number, required: true },
     description: { type: String, required: true },
     foodType: { type: [String], enum: Object.values(FoodType), required: true},

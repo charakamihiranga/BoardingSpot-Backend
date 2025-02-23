@@ -40,6 +40,7 @@ export interface IFoodSupplier extends Document {
         latitude: number;
         longitude: number;
     };
+    city: string;
     mobileNo: number;
     description: string;
     foodType: FoodType[];

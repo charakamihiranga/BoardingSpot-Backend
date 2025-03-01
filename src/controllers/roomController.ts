@@ -2,6 +2,7 @@ import express from "express";
 import {deleteImages, imageUploader} from "../utils/cloudinaryUtil";
 import Boarding from "../models/Boarding";
 import mongoose from "mongoose";
+import { log } from "console";
 
 export const addBoarding = async (req: express.Request, res: express.Response) => {
     try {
@@ -108,6 +109,7 @@ export const updateBoarding = async (req: any, res: any) => {
 }
 
 export const getBoardingsByOwner = async (req: any, res: any) => {
+    
     try {
         const {ownerId} = req.params;
         if (!mongoose.Types.ObjectId.isValid(ownerId)) {
@@ -152,8 +154,9 @@ export const getBoardings = async(req: any, res: any) => {
         res.status(500).json({message: 'Internal server error'});
     }
 }
-
+let count = 0;
 export const getBoardingsByLocationBounds = async (req: any, res: any) => {
+    
     try {
         const neLat = Number(req.query.neLat);
         const neLng = Number(req.query.neLng);

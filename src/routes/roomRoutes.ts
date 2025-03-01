@@ -11,9 +11,9 @@ import {protector} from "../middleware/authMiddleware";
 const router = Router();
 
 router.post('/',protector, upload, addBoarding);
-router.get('/',protector, getBoardings);
-router.get('/nearby',protector, getBoardingsByLocationBounds);
-router.get('/:id',protector, getBoardingById);
+router.get('/', getBoardings);
+router.get('/nearby', getBoardingsByLocationBounds);
+router.get('/:id', getBoardingById);
 router.delete('/:id',protector, deleteBoarding);
 router.get('/owner/:ownerId',protector, getBoardingsByOwner);
 router.patch('/:id',protector, upload, updateBoarding);

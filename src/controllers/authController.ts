@@ -1,10 +1,12 @@
+import { error, log } from "console";
 import User from "../models/User";
 import { generateRefreshToken, generateAccessToken } from "../utils/generateToken";
 import jwt, { Secret } from "jsonwebtoken";
 
 
 export const signUpUser = async (req: any, res: any) => {
-    const { fullName, email, dob, occupation, gender, profilePicture, password } = req.body;
+    
+    const { fullName, email, dob, gender, profilePicture, password } = req.body;
 
     try {
         const userExists = await User.findOne({ email });
@@ -13,7 +15,7 @@ export const signUpUser = async (req: any, res: any) => {
         }
 
         const user = await User.create({
-            fullName, email, dob, occupation, gender, profilePicture, password
+            fullName, email, dob, gender, profilePicture, password
         });
 
         if (user) {
@@ -34,6 +36,7 @@ export const signUpUser = async (req: any, res: any) => {
             res.status(400).json({ message: "Invalid user data" });
         }
     } catch (e) {
+        error(e);
         res.status(500).json({ message: "Internal server error" });
     }
 };

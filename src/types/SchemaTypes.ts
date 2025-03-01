@@ -8,7 +8,6 @@ export interface IUser extends Document {
     fullName: string;
     email: string;
     dob: Date;
-    occupation: Occupations;
     gender: Gender;
     profilePicture: string;
     password: string;

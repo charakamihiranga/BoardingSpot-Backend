@@ -44,7 +44,7 @@ export const getFoodSuppliers = async (req: any, res: any) => {
         const total = await FoodSupplier.countDocuments(query);
 
         const foodSuppliers = await FoodSupplier.find(query)
-            .sort({ createdAt: -1 }) // Newest first
+            .sort({ createdAt: -1 }) 
             .skip((Number(page) - 1) * Number(limit))
             .limit(Number(limit));
 

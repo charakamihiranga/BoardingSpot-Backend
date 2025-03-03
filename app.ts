@@ -3,14 +3,16 @@ import express, { Request, Response} from "express";
 import cors from "cors";
 import authRoutes from "./src/routes/authRoutes";
 import roomRoutes from "./src/routes/roomRoutes";
+import cookieParser from "cookie-parser";
 import foodSupplierRoutes from "./src/routes/foodSupplierRoutes";
 
 dotenv.config();
 
 
 const app = express();
-app.use(cors({origin: "*"}));
+app.use(cookieParser());
 app.use(express.json());
+app.use(express.urlencoded({ extended: false }));
 
 app.use(cors({
     origin: 'http://localhost:5173',

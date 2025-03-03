@@ -78,7 +78,7 @@ export const updateBoarding = async (req: any, res: any) => {
     try {
         const {id} = req.params;
         const updates = req.body;
-
+        
         if (!mongoose.Types.ObjectId.isValid(id)) {
             return res.status(400).json({message: "Invalid boarding ID"});
         }

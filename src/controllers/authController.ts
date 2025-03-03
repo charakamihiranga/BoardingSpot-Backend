@@ -54,6 +54,22 @@ export const signInUser = async (req: any, res: any) => {
         const accessToken = generateAccessToken(user._id as string);
         const refreshToken = generateRefreshToken(user._id as string);
 
+        // Store access token in HttpOnly cookie
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production", // Only secure in production
+            sameSite: "Strict",
+        });
+
+        // Store refresh token in HTTP-only cookie
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "strict",
+            path: "/",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+
         await user.save();
 
         res.json({
@@ -61,13 +77,12 @@ export const signInUser = async (req: any, res: any) => {
             fullName: user.fullName,
             email: user.email,
             gender: user.gender,
-            accessToken,
-            refreshToken
         });
     } catch (e) {
         res.status(500).json({ message: "Internal server error" });
     }
 };
+
 
 export const refreshToken = async (req: any, res: any) => {
     const authHeader = req.headers.authorization;
@@ -78,9 +93,15 @@ export const refreshToken = async (req: any, res: any) => {
     }
     try {
         const payload = jwt.verify(refreshToken, process.env.REFRESH_TOKEN_SECRET as Secret) as { userId: string };
+        const user = await User.findOne({ _id: payload.userId })
+            .select("fullName email gender")
+            .lean();
         const newAccessToken = generateAccessToken(payload.userId);
 
-        res.json({ accessToken: newAccessToken });
+        res.json({
+            user: user,
+            accessToken: newAccessToken
+        });
     } catch (e) {
         res.status(403).json({ message: "Invalid or expired refresh token" });
     }

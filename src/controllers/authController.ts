@@ -2,7 +2,60 @@ import { error, log } from "console";
 import User from "../models/User";
 import { generateRefreshToken, generateAccessToken } from "../utils/generateToken";
 import jwt, { Secret } from "jsonwebtoken";
+import {OAuth2Client} from "google-auth-library";
 
+const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
+
+export const googleAuth = async (req: any, res: any) => {
+    try {
+        const { token }  = req.body;
+        const ticket = await client.verifyIdToken({
+            idToken: token,
+            audience: process.env.GOOGLE_CLIENT_ID,
+        });
+        const payload = ticket.getPayload();
+        if (!payload) {
+            return res.status(401).json({message: "Invalid Google token"});
+        }
+        const {name, email, picture} = payload;
+        let user = await User.findOne({ email });
+        if (!user) {
+            user = await User.create({
+                fullName: name,
+                email,
+                profilePicture: picture,
+                password: ""
+            });
+        }
+        const accessToken = generateAccessToken(user._id as string);
+        const refreshToken = generateRefreshToken(user._id as string);
+
+        res.cookie("accessToken", accessToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+        });
+
+        res.cookie("refreshToken", refreshToken, {
+            httpOnly: true,
+            secure: process.env.NODE_ENV === "production",
+            sameSite: "Strict",
+            path: "/",
+            maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        });
+
+        res.status(200).json({
+            _id: user._id,
+            fullName: user.fullName,
+            email: user.email,
+            accessToken,
+            refreshToken,
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({message: "Internal Server error"});
+    }
+}
 
 export const signUpUser = async (req: any, res: any) => {
     
@@ -11,7 +64,7 @@ export const signUpUser = async (req: any, res: any) => {
     try {
         const userExists = await User.findOne({ email });
         if (userExists) {
-            return res.status(400).json({ message: "User already exists with this email. Use another email." });
+            return res.status(409).json({ message: "User already exists with this email. Use another email." });
         }
 
         const user = await User.create({

@@ -3,6 +3,7 @@ import User from "../models/User";
 import { generateRefreshToken, generateAccessToken } from "../utils/generateToken";
 import jwt, { Secret } from "jsonwebtoken";
 import {OAuth2Client} from "google-auth-library";
+import bcrypt from "bcryptjs";
 
 const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
@@ -24,7 +25,10 @@ export const googleAuth = async (req: any, res: any) => {
                 fullName: name,
                 email,
                 profilePicture: picture,
-                password: ""
+                // First, generates a random float number between 0 and 1, then converts it to a base-36 string,
+                // which includes digits (0-9) and lowercase letters (a-z). Then, it takes the last 8 characters from the string and uses it as the password,
+                // and 10 represents the number of rounds for bcrypt hashing
+                password: await bcrypt.hash(Math.random().toString(36).slice(-8),10)
             });
         }
         const accessToken = generateAccessToken(user._id as string);

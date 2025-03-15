@@ -142,9 +142,7 @@ export const signInUser = async (req: any, res: any) => {
 
 
 export const refreshToken = async (req: any, res: any) => {
-    const authHeader = req.headers.authorization;
-    const refreshToken = authHeader?.split(' ')[1];
-
+    const refreshToken = req.cookies.refreshToken;
     if (!refreshToken) {
         return res.status(401).json({ message: "No refresh token provided" });
     }

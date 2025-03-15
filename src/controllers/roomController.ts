@@ -2,7 +2,6 @@ import express from "express";
 import {deleteImages, imageUploader} from "../utils/cloudinaryUtil";
 import Boarding from "../models/Boarding";
 import mongoose from "mongoose";
-import { log } from "console";
 
 export const addBoarding = async (req: express.Request, res: express.Response) => {
     try {
@@ -122,24 +121,43 @@ export const getBoardingsByOwner = async (req: any, res: any) => {
     }
 }
 
-export const getBoardings = async(req: any, res: any) => {
+export const getBoardings = async (req: any, res: any) => {
     try {
-        const {city, genderPreference, capacity, maxPrice, foodAvailability,
-            forWhom, category, page=1, limit=10} = req.query;
+        const {
+            city,
+            genderPreference,
+            capacity,
+            maxPrice,
+            foodAvailability,
+            forWhom,
+            category,
+            page = 1,
+            limit = 10,
+        } = req.query;
+
         const filterQuery: any = {};
+
         if (city) filterQuery.city = city;
-        if (genderPreference) filterQuery.genderPreference = genderPreference;
+        if (genderPreference && genderPreference !== "anyone") {
+            filterQuery.genderPreference = genderPreference;
+        }
         if (capacity) filterQuery.capacity = { $gte: Number(capacity) };
         if (maxPrice) filterQuery.rent = { $lte: Number(maxPrice) };
-        if (foodAvailability) filterQuery.foodAvailability = foodAvailability === "true";
-        if (forWhom) filterQuery.forWhom = forWhom;
+        if (foodAvailability !== undefined) {
+            filterQuery.foodAvailability = foodAvailability === "true";
+        }
+        if (forWhom && forWhom !== "anyone") {
+            filterQuery.forWhom = forWhom;
+        }
         if (category) filterQuery.category = category;
 
+        // Get total count before pagination
         const total = await Boarding.countDocuments(filterQuery);
 
+        // Fetch paginated results
         const boardings = await Boarding.find(filterQuery)
-            .sort({ createdAt: -1})
-            .skip((Number(page) -1 ) * Number(limit))
+            .sort({ createdAt: -1 })
+            .skip((Number(page) - 1) * Number(limit))
             .limit(Number(limit));
 
         res.status(200).json({
@@ -151,9 +169,11 @@ export const getBoardings = async(req: any, res: any) => {
         });
     } catch (e) {
         console.error(e);
-        res.status(500).json({message: 'Internal server error'});
+        res.status(500).json({ message: "Internal server error" });
     }
-}
+};
+
+
 let count = 0;
 export const getBoardingsByLocationBounds = async (req: any, res: any) => {
     

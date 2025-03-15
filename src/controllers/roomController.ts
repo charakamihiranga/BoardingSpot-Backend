@@ -137,19 +137,19 @@ export const getBoardings = async (req: any, res: any) => {
 
         const filterQuery: any = {};
 
-        if (city) filterQuery.city = city;
-        if (genderPreference && genderPreference !== "anyone") {
-            filterQuery.genderPreference = genderPreference;
+        if (city) filterQuery.city = { $regex: new RegExp(city, "i") }; // Case-insensitive search
+        if (genderPreference && genderPreference.toLowerCase() !== "anyone") {
+            filterQuery.genderPreference = genderPreference.toLowerCase();
         }
         if (capacity) filterQuery.capacity = { $gte: Number(capacity) };
         if (maxPrice) filterQuery.rent = { $lte: Number(maxPrice) };
         if (foodAvailability !== undefined) {
             filterQuery.foodAvailability = foodAvailability === "true";
         }
-        if (forWhom && forWhom !== "anyone") {
-            filterQuery.forWhom = forWhom;
+        if (forWhom && forWhom.toLowerCase() !== "anyone") {
+            filterQuery.forWhom = forWhom.toLowerCase();
         }
-        if (category) filterQuery.category = category;
+        if (category) filterQuery.category = { $regex: new RegExp(category, "i") };
 
         // Get total count before pagination
         const total = await Boarding.countDocuments(filterQuery);

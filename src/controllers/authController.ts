@@ -37,13 +37,13 @@ export const googleAuth = async (req: any, res: any) => {
         res.cookie("accessToken", accessToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "Strict",
+            sameSite: "None",
         });
 
         res.cookie("refreshToken", refreshToken, {
             httpOnly: true,
             secure: process.env.NODE_ENV === "production",
-            sameSite: "Strict",
+            sameSite: "None",
             path: "/",
             maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
         });

@@ -1,11 +1,10 @@
-import express, { Request, Response } from 'express';
+// typically focus only on starting the server and connecting to the database
+import app from "./app";
+import connectDB from "./src/config/db";
 
-const app = express();
-const port = 3000;
+const port =process.env.PORT || 3000;
 
-app.use('/', (req: Request, res: Response) => {
-  res.send('Hello, world!');
-});
+connectDB();
 
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
